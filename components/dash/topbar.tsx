@@ -1,5 +1,5 @@
 "use client"
-import { ActivityIcon, BoltIcon, Settings, UserIcon } from 'lucide-react'
+import { ActivityIcon, BoltIcon, UserIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -24,8 +24,9 @@ const items = [
 
 function Topbar() {
     const pathname = usePathname()
+
     return (
-        <div className='border-b flex px-2 py-1.5 items-center justify-between text-sm'>
+        <div className='border-b flex p-2 items-center justify-between text-sm'>
             <div className='flex items-center gap-4'>
                 {items.map((item) => (
                     <Link key={item.label} href={item.href} className={`hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -38,14 +39,14 @@ function Topbar() {
                     <ActivityIcon size={14} />
                 </Link>
                 <Link href="" className='hover:text-primary text-muted-foreground'>
-                    <BoltIcon size={14} />
+                    <UserIcon size={14} />
                 </Link>
                 <Link href="" className='hover:text-primary text-muted-foreground'>
-                    <UserIcon size={14} />
+                    <BoltIcon size={14} />
                 </Link>
             </div>
         </div>
     )
 }
 
-export default Topbar
+export default Topbar
