@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import Topbar from "@/components/dash/topbar";
-import Statusbar from "@/components/dash/statusbar";
+import { ThemeProvider } from "@/components/providers";
+import { Topbar, Statusbar } from "@/components/layout";
 
 const jetBrainsMono = JetBrains_Mono({
   variable: "--font-mono",
@@ -11,7 +10,8 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Apex",
+  title: "Apex Terminal",
+  description: "Professional aerospace mission control interface",
 };
 
 export default function RootLayout({

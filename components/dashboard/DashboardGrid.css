@@ -1,0 +1,60 @@
+/* DashboardGrid overrides — react-grid-layout */
+.react-grid-item {
+    transition: none !important;
+}
+
+.react-grid-item.react-draggable-dragging {
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+.react-grid-item.resizing {
+    opacity: 1 !important;
+}
+
+/* Resize handles — both se and sw */
+.react-grid-item > .react-resizable-handle {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease;
+    z-index: 50 !important;
+}
+
+.react-grid-item:hover > .react-resizable-handle,
+.react-grid-item.resizing > .react-resizable-handle {
+    opacity: 0.6 !important;
+}
+
+.react-grid-item > .react-resizable-handle:hover,
+.react-grid-item > .react-resizable-handle:active {
+    opacity: 0.9 !important;
+}
+
+/* Override the default dark handle icon with a light grey one */
+.react-grid-item > .react-resizable-handle::after {
+    border-right-color: #a1a1aa !important;
+    border-bottom-color: #a1a1aa !important;
+}
+
+/* SW (bottom-left) handle — mirror the icon */
+.react-grid-item > .react-resizable-handle-sw {
+    bottom: 0;
+    left: 0;
+    cursor: sw-resize;
+}
+
+.react-grid-item > .react-resizable-handle-sw::after {
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-left: 2px solid #a1a1aa !important;
+    border-top: 2px solid #a1a1aa !important;
+    left: 3px !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 3px !important;
+}
+
+.react-grid-placeholder {
+    background: none !important;
+    box-shadow: none !important;
+    opacity: 0 !important;
+}
