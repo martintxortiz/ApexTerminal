@@ -82,7 +82,7 @@ function buildBaseOption(
                 typeof value === "number" ? value.toFixed(tooltipPrecision) : value,
         },
         legend: { show: false },
-        grid: { left: 12, right: 62, top: 10, bottom: 26, containLabel: false, borderWidth: 0 },
+        grid: { left: 0, right: 48, top: 4, bottom: 20, containLabel: false, borderWidth: 0 },
         xAxis: {
             type: "time" as const,
             boundaryGap: false,
@@ -91,9 +91,9 @@ function buildBaseOption(
             splitNumber: 3,
             axisLabel: {
                 color: "#e4e4e7",
-                fontSize: 12,
+                fontSize: 11,
                 fontFamily: "monospace",
-                margin: 10,
+                margin: 6,
                 hideOverlap: true,
                 formatter: "{HH}:{mm}:{ss}",
             },
@@ -104,15 +104,15 @@ function buildBaseOption(
         },
         yAxis: {
             type: "value" as const,
+            scale: true,
             position: "right" as const,
-            splitNumber: 2,
             axisLine: { show: false },
             axisTick: { show: false },
             axisLabel: {
                 color: "#e4e4e7",
-                fontSize: 12,
+                fontSize: 11,
                 fontFamily: "monospace",
-                margin: 10,
+                margin: 6,
                 formatter: (value: number) => value.toFixed(yPrecision),
             },
             splitLine: {
@@ -129,7 +129,6 @@ function buildBaseOption(
             animation: false,
             connectNulls: false,
             lineStyle: { width: 1, color: colors[i % colors.length] },
-            emphasis: { focus: "series" as const },
         })),
     };
 }
@@ -141,7 +140,6 @@ export const GraphWidget: React.FC<{ item: DashboardItem }> = React.memo(({ item
     const chartRef = useRef<echarts.ECharts | null>(null);
     const rafRef = useRef<number | null>(null);
     const dataRef = useRef<Record<string, Point[]>>({});
-    const yRangeRef = useRef<{ min: number; max: number } | null>(null);
 
     const [timeScale, setTimeScale] = useState<TimeScale>("1m");
     const [streaming, setStreaming] = useState(true);
@@ -182,37 +180,9 @@ export const GraphWidget: React.FC<{ item: DashboardItem }> = React.memo(({ item
                 if (cutIdx > 0) dataRef.current[key] = arr.slice(cutIdx);
             }
 
-            // Y-range: expand instantly, shrink slowly
-            let dataMin = Infinity;
-            let dataMax = -Infinity;
-            for (const key of keys) {
-                for (const [, v] of dataRef.current[key] ?? []) {
-                    if (v < dataMin) dataMin = v;
-                    if (v > dataMax) dataMax = v;
-                }
-            }
-            if (!Number.isFinite(dataMin)) { dataMin = 0; dataMax = 1; }
-            if (dataMin === dataMax) { dataMin -= 0.5; dataMax += 0.5; }
-
-            const pad = (dataMax - dataMin) * Y_PAD_RATIO;
-            const targetMin = dataMin - pad;
-            const targetMax = dataMax + pad;
-
-            const prev = yRangeRef.current;
-            let yMin: number, yMax: number;
-            if (!prev) {
-                yMin = targetMin;
-                yMax = targetMax;
-            } else {
-                yMin = targetMin < prev.min ? targetMin : prev.min + (targetMin - prev.min) * SHRINK_FACTOR;
-                yMax = targetMax > prev.max ? targetMax : prev.max + (targetMax - prev.max) * SHRINK_FACTOR;
-            }
-            yRangeRef.current = { min: yMin, max: yMax };
-
             chart.setOption(
                 {
                     xAxis: { min: minTs, max: latest },
-                    yAxis: { min: yMin, max: yMax },
                     series: keys.map((key) => ({ data: dataRef.current[key] ?? [] })),
                 },
                 { lazyUpdate: false, silent: true },
@@ -258,7 +228,6 @@ export const GraphWidget: React.FC<{ item: DashboardItem }> = React.memo(({ item
         const next: Record<string, Point[]> = {};
         for (const key of keys) next[key] = [];
         dataRef.current = next;
-        yRangeRef.current = null;
         scheduleRender();
     }, [item.id, keys, scheduleRender]);
 
@@ -307,7 +276,6 @@ export const GraphWidget: React.FC<{ item: DashboardItem }> = React.memo(({ item
                 }
 
                 dataRef.current = next;
-                yRangeRef.current = null;
                 scheduleRender();
             } catch (err) {
                 console.error("[GraphWidget] Failed to load history:", err);
@@ -362,8 +330,8 @@ export const GraphWidget: React.FC<{ item: DashboardItem }> = React.memo(({ item
                     type="button"
                     onClick={() => setTimeScale(scale)}
                     className={`rounded-sm px-1.5 py-0 text-[9px] font-medium transition-colors ${timeScale === scale
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         }`}
                 >
                     {scale}
@@ -374,8 +342,8 @@ export const GraphWidget: React.FC<{ item: DashboardItem }> = React.memo(({ item
                 type="button"
                 onClick={() => setStreaming((s) => !s)}
                 className={`rounded-sm px-1 py-0 text-[9px] font-medium transition-colors ${streaming
-                        ? "text-emerald-400 hover:bg-muted"
-                        : "text-amber-400 hover:bg-muted"
+                    ? "text-emerald-400 hover:bg-muted"
+                    : "text-amber-400 hover:bg-muted"
                     }`}
                 title={streaming ? "Pause live stream" : "Resume live stream"}
             >
@@ -397,7 +365,7 @@ export const GraphWidget: React.FC<{ item: DashboardItem }> = React.memo(({ item
                 {/* Legend */}
                 <div
                     className="absolute z-10 flex flex-col gap-0.5 pointer-events-none px-1.5 py-1"
-                    style={{ top: 10, left: 12, backgroundColor: "rgba(24, 24, 27, 0.85)", borderRadius: 2 }}
+                    style={{ top: 4, left: 0, backgroundColor: "rgba(24, 24, 27, 0.85)", borderRadius: 2 }}
                 >
                     {keys.map((key, i) => (
                         <div key={key} className="flex items-center gap-1.5 text-[11px] text-zinc-300">

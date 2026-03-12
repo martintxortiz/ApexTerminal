@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/providers";
+import { ThemeProvider, TelemetryProvider } from "@/components/providers";
 import { Topbar, Statusbar } from "@/components/layout";
 
 const jetBrainsMono = JetBrains_Mono({
@@ -30,13 +30,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex flex-col h-screen w-screen overflow-hidden">
-            <Topbar />
-            <main className="flex-1 overflow-auto flex flex-col">
-              {children}
-            </main>
-            <Statusbar />
-          </div>
+          <TelemetryProvider>
+            <div className="flex flex-col h-screen w-screen overflow-hidden">
+              <Topbar />
+              <main className="flex-1 overflow-hidden flex flex-col">
+                {children}
+              </main>
+              <Statusbar />
+            </div>
+          </TelemetryProvider>
         </ThemeProvider>
       </body>
     </html>
